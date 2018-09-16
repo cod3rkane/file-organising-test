@@ -5,12 +5,14 @@ import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Hidden from '@material-ui/core/Hidden';
 import Divider from '@material-ui/core/Divider';
 import MenuIcon from '@material-ui/icons/Menu';
+
+import { TagItem } from '../../shared/components/TagItem';
+import { FileItem } from '../../shared/components/FileItem';
 
 import './App.css';
 
@@ -38,7 +40,11 @@ const styles = theme => ({
       display: 'none'
     }
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: {
+    ...theme.mixins.toolbar,
+    display: 'flex',
+    alignItems: 'center'
+  },
   drawerPaper: {
     width: drawerWidth,
     [theme.breakpoints.up('md')]: {
@@ -49,26 +55,50 @@ const styles = theme => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     paddingTop: theme.spacing.unit * 3
+  },
+  tagTitle: {
+    margin: '0 auto'
   }
 });
 
 class App extends Component {
   state = {
-    mobileOpen: false
+    mobileOpen: false,
+    tags: [],
   };
 
   handleDrawerToggle = () => {
     this.setState(state => ({ mobileOpen: !state.mobileOpen }));
   };
 
+  componentDidMount() {
+    fetch('http://tim.uardev.com/trial-project/api/tags', {
+      method: 'GET'
+    }).then(response => {
+      return response.json();
+    }).then(tags => {
+      this.setState({ tags });
+    });
+  }
+
   render() {
     const { classes, theme } = this.props;
+    const tagList = this.state.tags.map(tag => <TagItem key={tag.tag} tag={tag.tag} files={tag.files} />);
     const drawer = (
       <div>
-        <div className={classes.toolbar} />
+        <div className={classes.toolbar}>
+          <Typography
+            className={classes.tagTitle}
+            variant="title"
+            color="inherit"
+            noWrap
+          >
+            Tags
+          </Typography>
+        </div>
         <Divider />
         <List>
-          <ListItem button>Item</ListItem>
+          {tagList}
         </List>
       </div>
     );
@@ -119,9 +149,9 @@ class App extends Component {
           </Hidden>
           <main className={classes.content}>
             <div className={classes.toolbar} />
-            <Typography noWrap>
-              {'You think water moves fast? You should see ice.'}
-            </Typography>
+            <FileItem id="1" name="Test" link="#" />
+            <FileItem id="2" name="Test 2" link="#" />
+            <FileItem id="3" name="Test 3" link="#" />
           </main>
         </div>
       </div>
