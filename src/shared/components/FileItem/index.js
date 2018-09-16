@@ -5,19 +5,19 @@ import { NavLink } from 'react-router-dom';
 
 import './style.css'
 
-export const FileItem = ({ id, name, link }) => {
+export const FileItem = ({ file, link, onClick }) => {
   return (
     <div className="file-item">
       <FileCopy className="file" />
-      <NavLink to={link} className="file-link">
-        <span>{name}</span>
+      <NavLink to={link} className="file-link" onClick={() => onClick(file)}>
+        <span>{file.name}</span>
       </NavLink>
     </div>
   );
 };
 
 PropTypes.propTypes = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
+  file: PropTypes.object.isRequired,
   link: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
 };

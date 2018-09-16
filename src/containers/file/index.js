@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -8,6 +9,8 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import { NavLink } from 'react-router-dom';
+
+import { actionSelectFile } from '../../store/Files';
 
 import './style.css';
 
@@ -60,9 +63,13 @@ const styles = theme => ({
 });
 
 class File extends React.Component {
-  state = {
-    name: 'File Name'
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: props.Files.selected.name
+    };
+    // @TODO fetch item from API when .selected doesn't exists.
+  }
 
   handleChange = name => event => {
     this.setState({
@@ -70,8 +77,23 @@ class File extends React.Component {
     });
   };
 
+  renameFile = () => {
+    fetch(
+      `http://tim.uardev.com/trial-project/api/file/${
+        this.props.Files.selected.id
+      }/rename`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({ filename: this.state.name })
+      }
+    );
+  };
+
   render() {
-    const { classes } = this.props;
+    const { classes, selectFile, Files } = this.props;
     return (
       <div className="App">
         <div className={classes.root}>
@@ -93,7 +115,7 @@ class File extends React.Component {
               margin="normal"
             />
             <div>
-              <NavLink to="/">
+              <NavLink to="/" onClick={() => selectFile(undefined)}>
                 <Button
                   variant="extendedFab"
                   aria-label="Delete"
@@ -107,6 +129,7 @@ class File extends React.Component {
                 variant="extendedFab"
                 color="primary"
                 className={classes.button}
+                onClick={this.renameFile}
               >
                 Save
               </Button>
@@ -118,6 +141,19 @@ class File extends React.Component {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(File);
-
 File.propTypes = {};
+
+const mapStateToProps = ({ Files }) => ({ Files });
+
+const mapDispatchToProps = dispatch => ({
+  selectFile(file) {
+    dispatch(actionSelectFile(file));
+  }
+});
+
+export default withStyles(styles, { withTheme: true })(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(File)
+);

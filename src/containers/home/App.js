@@ -14,7 +14,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 import { TagItem } from '../../shared/components/TagItem';
 import { FileItem } from '../../shared/components/FileItem';
-import { actionUpdateFiles } from '../../store/Files';
+import { actionUpdateFiles, actionSelectFile } from '../../store/Files';
 
 import './App.css';
 
@@ -92,7 +92,7 @@ class App extends Component {
   }
 
   render() {
-    const { classes, theme, Files } = this.props;
+    const { classes, theme, Files, selectFile } = this.props;
     const tagList = this.state.tags.map(tag => <TagItem key={tag.tag} tag={tag.tag} files={tag.files} />);
     const drawer = (
       <div>
@@ -112,7 +112,7 @@ class App extends Component {
         </List>
       </div>
     );
-    const fileList = Files.files.map(f => <FileItem key={f.id} id={f.id} name={f.name} link={`/file/${f.id}`} />);
+    const fileList = Files.files.map(f => <FileItem key={f.id} file={f} link={`/file/${f.id}`} onClick={selectFile}/>);
     return (
       <div className="App">
         <div className={classes.root}>
@@ -178,6 +178,9 @@ const mapStateToProps = ({ Files }) => ({ Files });
 const mapDispatchToProps = dispatch => ({
   updateFiles(files, total) {
     dispatch(actionUpdateFiles(files, total));
+  },
+  selectFile(file) {
+    dispatch(actionSelectFile(file));
   },
 });
 
