@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -13,6 +14,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 import { TagItem } from '../../shared/components/TagItem';
 import { FileItem } from '../../shared/components/FileItem';
+import { actionUpdateFiles } from '../../store/Files';
 
 import './App.css';
 
@@ -79,10 +81,18 @@ class App extends Component {
     }).then(tags => {
       this.setState({ tags });
     });
+
+    fetch('http://tim.uardev.com/trial-project/api/files?page=1', {
+      method: 'GET'
+    }).then(response => {
+      return response.json();
+    }).then(({ files, total_files }) => {
+      this.props.updateFiles(files, total_files);
+    });
   }
 
   render() {
-    const { classes, theme } = this.props;
+    const { classes, theme, Files } = this.props;
     const tagList = this.state.tags.map(tag => <TagItem key={tag.tag} tag={tag.tag} files={tag.files} />);
     const drawer = (
       <div>
@@ -102,6 +112,7 @@ class App extends Component {
         </List>
       </div>
     );
+    const fileList = Files.files.map(f => <FileItem key={f.id} id={f.id} name={f.name} link={`/file/${f.id}`} />);
     return (
       <div className="App">
         <div className={classes.root}>
@@ -149,9 +160,7 @@ class App extends Component {
           </Hidden>
           <main className={classes.content}>
             <div className={classes.toolbar} />
-            <FileItem id="1" name="Test" link="#" />
-            <FileItem id="2" name="Test 2" link="#" />
-            <FileItem id="3" name="Test 3" link="#" />
+            {fileList}
           </main>
         </div>
       </div>
@@ -164,4 +173,12 @@ App.propTypes = {
   theme: PropTypes.object.isRequired
 };
 
-export default withStyles(styles, { withTheme: true })(App);
+const mapStateToProps = ({ Files }) => ({ Files });
+
+const mapDispatchToProps = dispatch => ({
+  updateFiles(files, total) {
+    dispatch(actionUpdateFiles(files, total));
+  },
+});
+
+export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, mapDispatchToProps)(App));
