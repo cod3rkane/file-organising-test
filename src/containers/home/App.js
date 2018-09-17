@@ -79,6 +79,9 @@ class App extends Component {
   };
 
   componentDidMount() {
+    const {
+      match: { params }
+    } = this.props;
     fetch('http://tim.uardev.com/trial-project/api/tags', {
       method: 'GET'
     })
@@ -86,10 +89,10 @@ class App extends Component {
         return response.json();
       })
       .then(tags => {
-        this.setState({ tags });
+        this.setState({ tags, selected: { ...params } });
       });
 
-    fetch('http://tim.uardev.com/trial-project/api/files?page=1', {
+    fetch(`http://tim.uardev.com/trial-project/api/files?page=${params.page}&tag=${params.tag}`, {
       method: 'GET'
     })
       .then(response => {
@@ -97,6 +100,7 @@ class App extends Component {
       })
       .then(({ files, total_files }) => {
         this.props.updateFiles(files, total_files);
+        this.setState({ selected: { ...params } });
       });
   }
 
@@ -130,7 +134,7 @@ class App extends Component {
   }
 
   render() {
-    const { classes, theme, Files, selectFile } = this.props;
+    const { classes, theme, Files, selectFile, match: { params } } = this.props;
     let num = (Files.total / MAX_ITEMS).toString().split('.');
     num = num[1] > 0 ? parseInt(num[0]) + 1: num[0];
     const maxItems = isNaN(num) ? 0 : num;
@@ -209,7 +213,7 @@ class App extends Component {
           <main className={classes.content}>
             <div className={classes.toolbar} />
             {fileList}
-            <Paginate min={1} max={parseInt(maxItems)} selected={2} onClick={console.log}/>
+            <Paginate min={1} max={parseInt(maxItems)} selected={2} tag={params.tag}/>
           </main>
         </div>
       </div>
