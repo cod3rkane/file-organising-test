@@ -67,7 +67,7 @@ const styles = theme => ({
 
 class App extends Component {
   state = {
-    mobileOpen: false, // @TODO the better approuch for this it's create a new component to manage it.
+    mobileOpen: false,
     tags: [],
     selected: {
       page: undefined,

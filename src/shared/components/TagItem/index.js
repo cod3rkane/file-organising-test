@@ -6,7 +6,6 @@ import { NavLink } from 'react-router-dom';
 import './style.css';
 
 export const TagItem = ({ tag, files }) => {
-  // @TODO change page number dinamically.
   const linkTo = `/page/1/${tag}`;
   return (
     <ListItem button className="tag-item">

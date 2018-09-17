@@ -62,10 +62,10 @@ const styles = theme => ({
 class File extends React.Component {
   constructor(props) {
     super(props);
+    const { Files: { selected }} = props;
     this.state = {
-      name: props.Files.selected.name
+      name: selected && selected.name || undefined,
     };
-    // @TODO fetch item from API when .selected doesn't exists.
   }
 
   handleChange = name => event => {
@@ -91,6 +91,14 @@ class File extends React.Component {
 
   render() {
     const { classes, selectFile, history } = this.props;
+    if (!this.state.name) {
+      return (
+        <div>
+          Oops Something goes wrong! <NavLink to="/">Go to Home</NavLink>
+        </div>
+      );
+    }
+
     return (
       <div className="App">
         <div className={classes.root}>
