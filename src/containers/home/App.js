@@ -57,7 +57,8 @@ const styles = theme => ({
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    paddingTop: theme.spacing.unit * 3
+    paddingTop: theme.spacing.unit * 3,
+    paddingLeft: theme.spacing.unit * 3,
   },
   tagTitle: {
     margin: '0 auto'
@@ -227,7 +228,9 @@ class App extends Component {
           </Hidden>
           <main className={classes.content}>
             <div className={classes.toolbar} />
-            {fileList}
+            <div className="content">
+              {fileList}
+            </div>
             <Paginate
               min={1}
               max={parseInt(maxItems)}

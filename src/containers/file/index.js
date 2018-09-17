@@ -89,7 +89,7 @@ class File extends React.Component {
         },
         body: JSON.stringify({ filename: this.state.name })
       }
-    );
+    ).then(() => this.props.history.goBack());
   };
 
   render() {
