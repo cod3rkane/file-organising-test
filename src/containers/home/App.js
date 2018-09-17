@@ -15,15 +15,16 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { TagItem } from '../../shared/components/TagItem';
 import { FileItem } from '../../shared/components/FileItem';
 import { actionUpdateFiles, actionSelectFile } from '../../store/Files';
+import Paginate from '../../shared/components/Paginate'; 
 
 import './App.css';
 
 const drawerWidth = 240;
+const MAX_ITEMS = 10;
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    height: 440,
     zIndex: 1,
     overflow: 'hidden',
     position: 'relative',
@@ -130,6 +131,9 @@ class App extends Component {
 
   render() {
     const { classes, theme, Files, selectFile } = this.props;
+    let num = (Files.total / MAX_ITEMS).toString().split('.');
+    num = num[1] > 0 ? parseInt(num[0]) + 1: num[0];
+    const maxItems = isNaN(num) ? 0 : num;
     const tagList = this.state.tags.map(tag => (
       <TagItem key={tag.tag} tag={tag.tag} files={tag.files} />
     ));
@@ -205,6 +209,7 @@ class App extends Component {
           <main className={classes.content}>
             <div className={classes.toolbar} />
             {fileList}
+            <Paginate min={1} max={parseInt(maxItems)} selected={2} onClick={console.log}/>
           </main>
         </div>
       </div>
