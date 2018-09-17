@@ -93,7 +93,7 @@ class File extends React.Component {
   };
 
   render() {
-    const { classes, selectFile, Files } = this.props;
+    const { classes, selectFile, history } = this.props;
     return (
       <div className="App">
         <div className={classes.root}>
@@ -115,16 +115,18 @@ class File extends React.Component {
               margin="normal"
             />
             <div>
-              <NavLink to="/" onClick={() => selectFile(undefined)}>
-                <Button
-                  variant="extendedFab"
-                  aria-label="Delete"
-                  className={classes.button}
-                >
-                  <ArrowBack className={classes.extendedIcon} />
-                  Back to File List
-                </Button>
-              </NavLink>
+              <Button
+                variant="extendedFab"
+                aria-label="Delete"
+                className={classes.button}
+                onClick={() => {
+                  history.goBack();
+                  selectFile(undefined);
+                }}
+              >
+                <ArrowBack className={classes.extendedIcon} />
+                Back to File List
+              </Button>
               <Button
                 variant="extendedFab"
                 color="primary"
