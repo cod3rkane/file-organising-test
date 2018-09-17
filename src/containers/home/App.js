@@ -15,7 +15,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { TagItem } from '../../shared/components/TagItem';
 import { FileItem } from '../../shared/components/FileItem';
 import { actionUpdateFiles, actionSelectFile } from '../../store/Files';
-import Paginate from '../../shared/components/Paginate'; 
+import Paginate from '../../shared/components/Paginate';
 
 import './App.css';
 
@@ -91,10 +91,14 @@ class App extends Component {
       .then(tags => {
         this.setState({ tags, selected: { ...params } });
       });
-
-    fetch(`http://tim.uardev.com/trial-project/api/files?page=${params.page}&tag=${params.tag}`, {
-      method: 'GET'
-    })
+    const page = params.page || 1;
+    const tagname = params.tag || '';
+    fetch(
+      `http://tim.uardev.com/trial-project/api/files?page=${page}&tag=${tagname}`,
+      {
+        method: 'GET'
+      }
+    )
       .then(response => {
         return response.json();
       })
@@ -119,9 +123,14 @@ class App extends Component {
       Object.getOwnPropertyNames(params).length !== 0 &&
       !isTheSameSelected(params, this.state.selected)
     ) {
-      fetch(`http://tim.uardev.com/trial-project/api/files?page=${params.page}&tag=${params.tag}`, {
-        method: 'GET'
-      })
+      const page = params.page || 1;
+      const tagname = params.tag || '';
+      fetch(
+        `http://tim.uardev.com/trial-project/api/files?page=${page}&tag=${tagname}`,
+        {
+          method: 'GET'
+        }
+      )
         .then(response => {
           return response.json();
         })
@@ -134,9 +143,15 @@ class App extends Component {
   }
 
   render() {
-    const { classes, theme, Files, selectFile, match: { params } } = this.props;
+    const {
+      classes,
+      theme,
+      Files,
+      selectFile,
+      match: { params }
+    } = this.props;
     let num = (Files.total / MAX_ITEMS).toString().split('.');
-    num = num[1] > 0 ? parseInt(num[0]) + 1: num[0];
+    num = num[1] > 0 ? parseInt(num[0]) + 1 : num[0];
     const maxItems = isNaN(num) ? 0 : num;
     const tagList = this.state.tags.map(tag => (
       <TagItem key={tag.tag} tag={tag.tag} files={tag.files} />
@@ -213,7 +228,12 @@ class App extends Component {
           <main className={classes.content}>
             <div className={classes.toolbar} />
             {fileList}
-            <Paginate min={1} max={parseInt(maxItems)} selected={2} tag={params.tag}/>
+            <Paginate
+              min={1}
+              max={parseInt(maxItems)}
+              selected={2}
+              tag={params.tag || ''}
+            />
           </main>
         </div>
       </div>
