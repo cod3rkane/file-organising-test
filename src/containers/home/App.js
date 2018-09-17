@@ -65,8 +65,12 @@ const styles = theme => ({
 
 class App extends Component {
   state = {
-    mobileOpen: false,
+    mobileOpen: false, // @TODO the better approuch for this it's create a new component to manage it.
     tags: [],
+    selected: {
+      page: undefined,
+      tag: undefined
+    }
   };
 
   handleDrawerToggle = () => {
@@ -76,24 +80,59 @@ class App extends Component {
   componentDidMount() {
     fetch('http://tim.uardev.com/trial-project/api/tags', {
       method: 'GET'
-    }).then(response => {
-      return response.json();
-    }).then(tags => {
-      this.setState({ tags });
-    });
+    })
+      .then(response => {
+        return response.json();
+      })
+      .then(tags => {
+        this.setState({ tags });
+      });
 
     fetch('http://tim.uardev.com/trial-project/api/files?page=1', {
       method: 'GET'
-    }).then(response => {
-      return response.json();
-    }).then(({ files, total_files }) => {
-      this.props.updateFiles(files, total_files);
-    });
+    })
+      .then(response => {
+        return response.json();
+      })
+      .then(({ files, total_files }) => {
+        this.props.updateFiles(files, total_files);
+      });
+  }
+
+  componentDidUpdate(prevProps, prevState, snp) {
+    const {
+      match: { params }
+    } = this.props;
+    const isTheSameSelected = (sel, sel2) => {
+      if (sel.page === sel2.page && sel.tag === sel2.tag) {
+        return true;
+      }
+
+      return false;
+    };
+    if (
+      Object.getOwnPropertyNames(params).length !== 0 &&
+      !isTheSameSelected(params, this.state.selected)
+    ) {
+      fetch(`http://tim.uardev.com/trial-project/api/files?page=${params.page}&tag=${params.tag}`, {
+        method: 'GET'
+      })
+        .then(response => {
+          return response.json();
+        })
+        .then(({ files, total_files }) => {
+          this.props.updateFiles(files, total_files);
+        });
+
+      this.setState({ selected: { ...params } });
+    }
   }
 
   render() {
     const { classes, theme, Files, selectFile } = this.props;
-    const tagList = this.state.tags.map(tag => <TagItem key={tag.tag} tag={tag.tag} files={tag.files} />);
+    const tagList = this.state.tags.map(tag => (
+      <TagItem key={tag.tag} tag={tag.tag} files={tag.files} />
+    ));
     const drawer = (
       <div>
         <div className={classes.toolbar}>
@@ -107,12 +146,17 @@ class App extends Component {
           </Typography>
         </div>
         <Divider />
-        <List>
-          {tagList}
-        </List>
+        <List>{tagList}</List>
       </div>
     );
-    const fileList = Files.files.map(f => <FileItem key={f.id} file={f} link={`/file/${f.id}`} onClick={selectFile}/>);
+    const fileList = Files.files.map(f => (
+      <FileItem
+        key={f.id}
+        file={f}
+        link={`/file/${f.id}`}
+        onClick={selectFile}
+      />
+    ));
     return (
       <div className="App">
         <div className={classes.root}>
@@ -181,7 +225,12 @@ const mapDispatchToProps = dispatch => ({
   },
   selectFile(file) {
     dispatch(actionSelectFile(file));
-  },
+  }
 });
 
-export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, mapDispatchToProps)(App));
+export default withStyles(styles, { withTheme: true })(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(App)
+);

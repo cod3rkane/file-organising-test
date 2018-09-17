@@ -16,6 +16,7 @@ export const Routes = () => {
   return (
     <Switch>
       <Route exact path="/" component={App} />
+      <Route path="/page/:page/:tag?" component={App} />
       <Route path="/file/:id" component={File} />
       <Route component={NoMatch}/>
     </Switch>
